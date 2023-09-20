@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../static/brython/brython.js"></script>
+    <script type="text/javascript" src="../static/brython/brython_stdlib.js"></script>
+</head>
+<body onload="brython()">
+    <button id="runScript">Click</button>
+    <script type="text/python">
+        from browser import document, html
+
+        def draw_square(ev):
+            canvas = html.CANVAS(width=500, height=500)
+            document <= canvas
+            ctx = canvas.getContext("2d")
+            ctx.fillStyle = "gray"
+            ctx.fillRect(0, 0, 500, 500)
+
+        def drag_obj(ev):
+            pass
+            
+        document["runScript"].bind("click",draw_square)
+    </script>
+</body>
+</html>
