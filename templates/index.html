@@ -2,25 +2,89 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Application</title>
+    <link rel="stylesheet" href="./static/style.css" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script type="text/javascript" src="../static/brython/brython.js"></script>
     <script type="text/javascript" src="../static/brython/brython_stdlib.js"></script>
 </head>
-<body onload="brython()">
-    <button id="runScript">Click</button>
+<body onload="brython()" class="container-fluid bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#"><h1>thinkChart</h1></a>
+        <!-- Add your navigation links here -->
+    </nav>
+    <div class="container-fluid full-height full-width">
+        <div class="row bg-dark h-auto w-auto">
+            <!-- Settings Form Column -->
+            <div class="col-md-3 bg-dark card w-25" id="settings-form">
+                <div class="card-header text-light-emphasis"><h3>Settings</h3></div>
+                
+                <!-- Add your settings form controls here -->
+                <!-- For example, you can add input fields, sliders, buttons, etc. -->
+                <button id="run_add" class="btn btn-primary">Draw Square</button>
+            </div>
+
+            <!-- Canvas Column -->
+            <div class="col-md-9">
+                <div id="zone">
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script type="text/python">
         from browser import document, html
 
-        def draw_square(ev):
-            canvas = html.CANVAS(width=500, height=500)
-            document <= canvas
-            ctx = canvas.getContext("2d")
-            ctx.fillStyle = "gray"
-            ctx.fillRect(0, 0, 500, 500)
+        class ElementMove:
 
-        def drag_obj(ev):
-            pass
-            
-        document["runScript"].bind("click",draw_square)
+            def __init__(self, moving):
+                """Make "moving" element movable with the mouse"""
+                self.moving = moving
+                self.is_moving = False
+                self.moving.bind("mousedown", self.start)
+                self.moving.bind("mouseup", self.stop)
+                moving.style.cursor = "move"
+                moving.style.position = "absolute"
+                moving.classList.add("btn","btn-outline-danger")
+        
+            def start(self, event):
+                """When user clicks on the moving element, set boolean is_moving
+                to True and store mouse and moving element positions"""
+                self.is_moving = True
+                self.mouse_pos = [event.x, event.y]
+                self.elt_pos = [self.moving.left, self.moving.top]
+                document.bind("mousemove", self.move)
+                # prevent default behaviour to avoid selecting the moving element
+                event.preventDefault()
+        
+            def move(self, event):
+                """User moves the mouse"""
+                if not self.is_moving:
+                    return
+        
+                # set new moving element coordinates
+                self.moving.left = self.elt_pos[0] + event.x - self.mouse_pos[0]
+                self.moving.top = self.elt_pos[1] + event.y - self.mouse_pos[1]
+        
+            def stop(self, event):
+                """When user releases the mouse button, stop moving the element"""
+                self.is_moving = False
+                document.unbind("mousemove")
+
+        element = document.getElementById("zone")
+        nb = 0
+
+        def add_element(event):
+            global nb
+            new_obj = html.DIV(f"drag_me_{nb}",id=f"obj{nb}")
+            element <= new_obj
+            nb += 1
+            ElementMove(document[new_obj.id])
+        document["run_add"].bind("click", add_element)
     </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
