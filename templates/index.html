@@ -111,8 +111,10 @@
             global show_dots
             if show_dots:
                 show_dots = False
+                document["show_hide_dots"].text = "Show"
             else:
                 show_dots = True
+                document["show_hide_dots"].text = "Hide"
             dots = document.select('.spanDot')
             for dot in dots:     
                 if show_dots:
