@@ -9,7 +9,7 @@
     <script type="text/javascript" src="../static/brython/brython.js"></script>
     <script type="text/javascript" src="../static/brython/brython_stdlib.js"></script>
 </head>
-<body onload="brython()" class="container-fluid bg-dark">
+<body onload="brython(2)" data-bs-theme="dark" class="container-fluid bg-dark">
     <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="#"><h1>thinkChart</h1></a>
         <!-- Add your navigation links here -->
@@ -23,18 +23,26 @@
                 <!-- Add your settings form controls here -->
                 <!-- For example, you can add input fields, sliders, buttons, etc. -->
                 <button id="run_add" class="btn btn-primary">Draw Square</button>
+                <button id="show_hide_dots" class="btn btn-primary">Show</button>
             </div>
 
             <!-- Canvas Column -->
             <div class="col-md-9">
                 <div id="zone">
+                    <button type="button" class="btn btn-primary position-relative">
+                        Profile
+                        <span class="spanDot position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle visually-hidden"></span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
     <script type="text/python">
-        from browser import document, html
+        from browser import document, html, bind
+
+        show_dots = False
+        nb = 0
 
         class ElementMove:
 
@@ -47,6 +55,20 @@
                 moving.style.cursor = "move"
                 moving.style.position = "absolute"
                 moving.classList.add("btn","btn-outline-danger")
+                self.positions = [
+                    ["top-50","start-0"],
+                    ["top-50","start-100"],
+                    ["top-0","start-50"],
+                    ["top-100","start-50"]
+                ]
+                for pos in self.positions:
+                    self.dot = html.SPAN("")
+                    self.dot.classList.add("spanDot","position-absolute",pos[0],pos[1],"translate-middle","p-2","bg-danger","rounded-circle")
+                    if show_dots:
+                        self.dot.classList.remove("visually-hidden")
+                    else:
+                        self.dot.classList.add("visually-hidden")
+                    self.moving <= self.dot
         
             def start(self, event):
                 """When user clicks on the moving element, set boolean is_moving
@@ -72,16 +94,31 @@
                 self.is_moving = False
                 document.unbind("mousemove")
 
-        element = document.getElementById("zone")
-        nb = 0
-
+        
+        
+        @bind("#run_add","click")
         def add_element(event):
             global nb
+            element = document.getElementById("zone")
             new_obj = html.DIV(f"drag_me_{nb}",id=f"obj{nb}")
+            new_obj
             element <= new_obj
             nb += 1
             ElementMove(document[new_obj.id])
-        document["run_add"].bind("click", add_element)
+
+        @bind("#show_hide_dots", "click")
+        def show_hide_dots(event):
+            global show_dots
+            if show_dots:
+                show_dots = False
+            else:
+                show_dots = True
+            dots = document.select('.spanDot')
+            for dot in dots:     
+                if show_dots:
+                    dot.classList.remove("visually-hidden")
+                else:
+                    dot.classList.add("visually-hidden")
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
